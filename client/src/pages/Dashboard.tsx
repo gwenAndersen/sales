@@ -5,7 +5,7 @@ import ChartCard from "@/components/ChartCard";
 import AIInsightCard from "@/components/AIInsightCard";
 import DataEntryModal from "@/components/DataEntryModal";
 import EmptyState from "@/components/EmptyState";
-import { DollarSign, TrendingUp, ShoppingCart, Wallet, Database } from "lucide-react";
+import { DollarSign, TrendingUp, ShoppingCart, Wallet, Database, ListOrdered } from "lucide-react"; // Added ListOrdered
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,36 +14,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useBusinessMetrics } from "@/hooks/use-business-metrics";
+import { type InsertBusinessMetric } from "@shared/schema";
+import { Link } from "wouter"; // New import
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hasData] = useState(true); // todo: remove mock functionality
+  const { metrics, isLoading, createMetric } = useBusinessMetrics();
 
-  // todo: remove mock functionality
-  const mockMetrics = [
+  const hasData = !isLoading && metrics && metrics.length > 0;
+
+  const totalRevenue = metrics?.reduce((acc, m) => acc + parseFloat(m.revenue), 0) || 0;
+  const totalSales = metrics?.reduce((acc, m) => acc + parseInt(m.sales), 0) || 0;
+  const totalExpenses = metrics?.reduce((acc, m) => acc + parseFloat(m.expenses || '0'), 0) || 0;
+  const totalProfit = metrics?.reduce((acc, m) => acc + parseFloat(m.profit || '0'), 0) || 0;
+
+  const displayMetrics = [
     {
       title: "Total Revenue",
-      value: "$45,231",
-      trend: { value: 12.5, direction: "up" as const },
+      value: `$${totalRevenue.toLocaleString()}`,
       icon: <DollarSign className="w-6 h-6" />,
     },
     {
-      title: "Sales",
-      value: "2,345",
-      trend: { value: 8.2, direction: "up" as const },
-      icon: <ShoppingCart className="w-6 h-6" />,
-    },
-    {
       title: "Profit",
-      value: "$12,456",
-      trend: { value: 3.1, direction: "down" as const },
+      value: `$${totalProfit.toLocaleString()}`,
       icon: <TrendingUp className="w-6 h-6" />,
     },
     {
       title: "Expenses",
-      value: "$32,775",
-      trend: { value: 0, direction: "neutral" as const },
+      value: `$${totalExpenses.toLocaleString()}`,
       icon: <Wallet className="w-6 h-6" />,
+    },
+    {
+      title: "Sales Items",
+      value: "View All",
+      icon: <ListOrdered className="w-6 h-6" />,
+      link: "/sales", // Link to the new sales page
     },
   ];
 
@@ -66,6 +72,14 @@ export default function Dashboard() {
     },
   ];
 
+  const handleCreateMetric = (metric: InsertBusinessMetric) => {
+    createMetric(metric);
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <DashboardHeader onAddData={() => setIsModalOpen(true)} />
@@ -82,7 +96,7 @@ export default function Dashboard() {
         ) : (
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {mockMetrics.map((metric, index) => (
+              {displayMetrics.map((metric, index) => (
                 <MetricCard key={index} {...metric} />
               ))}
             </div>
@@ -163,7 +177,7 @@ export default function Dashboard() {
         )}
       </main>
 
-      <DataEntryModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <DataEntryModal open={isModalOpen} onOpenChange={setIsModalOpen} onSubmit={handleCreateMetric} />
     </div>
   );
 }

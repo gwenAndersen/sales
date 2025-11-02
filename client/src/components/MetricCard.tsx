@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "wouter"; // New import
 
 interface MetricCardProps {
   title: string;
@@ -11,9 +12,10 @@ interface MetricCardProps {
   };
   icon?: React.ReactNode;
   className?: string;
+  link?: string; // New prop
 }
 
-export default function MetricCard({ title, value, trend, icon, className }: MetricCardProps) {
+export default function MetricCard({ title, value, trend, icon, className, link }: MetricCardProps) {
   const getTrendIcon = () => {
     if (!trend) return null;
     if (trend.direction === "up") return <ArrowUp className="w-4 h-4" />;
@@ -28,7 +30,7 @@ export default function MetricCard({ title, value, trend, icon, className }: Met
     return "text-muted-foreground";
   };
 
-  return (
+  const content = (
     <Card className={cn("p-6", className)} data-testid={`card-metric-${title.toLowerCase().replace(/\s+/g, "-")}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-2 flex-1">
@@ -53,4 +55,10 @@ export default function MetricCard({ title, value, trend, icon, className }: Met
       </div>
     </Card>
   );
+
+  if (link) {
+    return <Link href={link}>{content}</Link>;
+  }
+
+  return content;
 }

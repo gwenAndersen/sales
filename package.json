@@ -11,6 +11,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@esbuild/android-arm64": "^0.25.12",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
@@ -100,8 +101,5 @@
     "tsx": "^4.20.5",
     "typescript": "5.6.3",
     "vite": "^5.4.20"
-  },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.8"
   }
 }

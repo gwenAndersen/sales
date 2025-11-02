@@ -10,13 +10,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { type InsertBusinessMetric } from "@shared/schema";
 
 interface DataEntryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSubmit: (metric: InsertBusinessMetric) => void;
 }
 
-export default function DataEntryModal({ open, onOpenChange }: DataEntryModalProps) {
+export default function DataEntryModal({ open, onOpenChange, onSubmit }: DataEntryModalProps) {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     revenue: "",
@@ -27,7 +29,13 @@ export default function DataEntryModal({ open, onOpenChange }: DataEntryModalPro
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    const newMetric: InsertBusinessMetric = {
+      ...formData,
+      revenue: parseFloat(formData.revenue),
+      sales: parseInt(formData.sales, 10),
+      expenses: formData.expenses ? parseFloat(formData.expenses) : undefined,
+    };
+    onSubmit(newMetric);
     onOpenChange(false);
     setFormData({
       date: new Date().toISOString().split('T')[0],

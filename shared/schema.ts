@@ -39,3 +39,20 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type BusinessMetric = typeof businessMetrics.$inferSelect;
 export type InsertBusinessMetric = z.infer<typeof insertBusinessMetricSchema>;
+
+export const salesItems = pgTable("sales_items", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  link: text("link"),
+  name: text("name").notNull(),
+  quantity: numeric("quantity", { precision: 10, scale: 0 }).notNull(),
+  state: text("state").notNull().default("pending"), // "pending" or "done"
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertSalesItemSchema = createInsertSchema(salesItems).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type SalesItem = typeof salesItems.$inferSelect;
+export type InsertSalesItem = z.infer<typeof insertSalesItemSchema>;
